@@ -3,9 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 //register user here
 const registeredUsers = {
-    "E4 20 24 2A": "Nguyen Van A",
-    "59 A0 B7 B8": "Nguyen Van B",
-    "D4 BD 28 2A": "Nguyen Van C"
+    "04 D8 C1 2B ": "Nguyen Teo Van",
+    "A7 A4 90 5F": "Tran Van Bao",
 }
 
 export const getUser = async (rfid) => {

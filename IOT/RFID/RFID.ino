@@ -3,13 +3,13 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define ssid "VU"
-#define password "0933261747"
+#define ssid "Nguyen MInh"
+#define password "268268268"
 
 // MQTT Broker Information
 #define mqtt_domain "broker.emqx.io"
 #define mqtt_port 1883
-#define mqtt_topic_pub "hntt/thcntt3/rfid"
+#define mqtt_topic_pub "VinhH/rfid"
 
 // RFID
 #define SS_PIN D8
@@ -17,22 +17,22 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 // LED
-#define CanRead D0
-#define WaitingLED D1
-#define SuccessfulLED D2
+// #define CanRead D0
+// #define WaitingLED D1
+// #define SuccessfulLED D2
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-void initializePinMode() {
-  Serial.println("\nInitialize PinMode");
+// void initializePinMode() {
+//   Serial.println("\nInitialize PinMode");
 
-  pinMode(CanRead, INPUT);
-  pinMode(WaitingLED, OUTPUT);
-  pinMode(SuccessfulLED, OUTPUT);
+//   pinMode(CanRead, INPUT);
+//   pinMode(WaitingLED, OUTPUT);
+//   pinMode(SuccessfulLED, OUTPUT);
 
-  Serial.println("Done");
-}
+//   Serial.println("Done");
+// }
 
 void initializeWIFI() {
   Serial.println("\nInitialize Wifi");
@@ -64,7 +64,7 @@ void setup() {
   Serial.begin(115200);
 
   // initialize
-  initializePinMode();
+  // initializePinMode();
   initializeWIFI();
   initializeRFID();
 
@@ -93,7 +93,7 @@ void reconnect() {
   // lặp cho đến khi được kết nối trở lại
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("mqttx_2d3c7c66")) {
+    if (client.connect("mqttx_954e093c")) {
       Serial.println("Connected");
       client.publish(mqtt_topic_pub, "Connected from NodeMCU ESP8266");
       client.subscribe(mqtt_topic_pub);
@@ -130,8 +130,8 @@ void processRFID() {
   if (millis() - lastMessageTime > 1000) {
     String RFIDData = readRFID();
 
-    digitalWrite(SuccessfulLED, LOW);
-    digitalWrite(WaitingLED, HIGH);
+    // digitalWrite(SuccessfulLED, LOW);
+    // digitalWrite(WaitingLED, HIGH);
 
     if (!(RFIDData == "")) {
       const char *msg = RFIDData.c_str();
@@ -139,8 +139,8 @@ void processRFID() {
       client.publish(mqtt_topic_pub, msg);
 
       lastMessageTime = millis();
-      digitalWrite(SuccessfulLED, HIGH);
-      digitalWrite(WaitingLED, LOW);
+      // digitalWrite(SuccessfulLED, HIGH);
+      // digitalWrite(WaitingLED, LOW);
     }
   }
 }
@@ -149,10 +149,10 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-
-  if (digitalRead(CanRead)) {
-    processRFID();
-  }
+  processRFID();
+  // if (digitalRead(CanRead)) {
+  //   processRFID();
+  // }
 
   client.loop();
 }

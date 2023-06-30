@@ -1,6 +1,5 @@
 import { initExpress, initFirebase, initRouter, initMQTT } from './core/core.js';
 
-
 export const expressApp = initExpress();
 initRouter(expressApp);
 
