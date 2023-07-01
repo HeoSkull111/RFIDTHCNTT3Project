@@ -15,7 +15,12 @@ const serverAPI = "http://localhost:5555/"
 export const Admin = () => {
   const [users, setUsers] = useState([]);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [newUser, setNewUser] = useState("");
+  const [newUserStatus, setNewUserStatus] = useState(false);
+
+  const [modalNewUserVisible, setModalNewUserVisible] = useState(false);
+  const [modalStatusVisible, setModalStatusVisible] = useState(false);
+
   const [text, setText] = useState("");
 
   useEffect(() => {
@@ -25,7 +30,33 @@ export const Admin = () => {
     getUsers();
   }, []);
 
-  const onMessageArrived = async (m) => {
+  const onMessageArrived = async (message) => {
+    const topicString = message.destinationName;
+    const payloadString = message.payloadString;
+
+    console.log("topic: ", topicString);
+    console.log("payload: ", payloadString);
+
+    if (topicString === "VinhH/rfid/admin/register/response/create") {
+      setModalNewUserVisible(true);
+      setNewUser(payloadString);
+      return;
+    }
+
+    if (topicString === "VinhH/rfid/admin/register/response/successful") {
+      setModalNewUserVisible(false);
+      setNewUserStatus(true);
+      setModalStatusVisible(true);
+      return;
+    }
+
+    if (topicString === "VinhH/rfid/admin/register/response/failed") {
+      setModalNewUserVisible(false);
+      setNewUserStatus(false);
+      setModalStatusVisible(true);
+      return;
+    }
+
     getUsers();
   }
 
@@ -40,12 +71,18 @@ export const Admin = () => {
     }));
   }
 
-  const handleOnCloseModal = () => {
-    setModalVisible(!modalVisible);
+  const handleOnCloseModalNewUser = () => {
+    setModalNewUserVisible(!modalNewUserVisible);
 
-    // if (text === '') return;
+    if (text === '') return;
+    mqttAdmin.publishMessage("VinhH/rfid/admin/register", `{ "name": "${text}", "rfid": "${newUser}" }`);
     // const targetDoc = doc(firebaseDB, 'users', rfid);
     // setDoc(targetDoc, { name: text, rfid, status: false }).then(() => { setText(''); });
+  }
+
+  const handleOnCloseModalStatus = () => {
+    setModalStatusVisible(!modalStatusVisible);
+    getUsers();
   }
 
   return (
@@ -65,11 +102,12 @@ export const Admin = () => {
       <Modal
         animationType="slide"
         transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => { handleOnCloseModal(); }}>
+        visible={modalNewUserVisible}
+        onRequestClose={() => { handleOnCloseModalNewUser(); }}>
         <View style={styles.modalContainer}>
           <View style={styles.modalWrapper}>
             <Text style={styles.modalTitle}>Create New User</Text>
+            <Text> {newUser} </Text>
             <TextInput
               style={[styles.text, styles.modalInput]}
               placeholder="new name"
@@ -78,7 +116,26 @@ export const Admin = () => {
             />
             <Pressable
               style={[styles.button, styles.buttonClose]}
-              onPress={() => { handleOnCloseModal(); }}>
+              onPress={() => { handleOnCloseModalNewUser(); }}>
+              <Text style={styles.text}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalStatusVisible}
+        onRequestClose={() => { handleOnCloseModalStatus(); }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalWrapper}>
+            <Text style={styles.modalTitle}>{
+              newUserStatus ? "Create New User Successful" : "Create New User Failed"
+            }</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => { handleOnCloseModalStatus(); }}>
               <Text style={styles.text}>Close</Text>
             </Pressable>
           </View>

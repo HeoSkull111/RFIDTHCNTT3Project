@@ -23,7 +23,9 @@ export const mqttOptionCustomer = {
 };
 export const topicAdmin = [
     "VinhH/rfid/admin",
-    "VinhH/rfid/admin/register",
+    "VinhH/rfid/admin/register/response/create",
+    "VinhH/rfid/admin/register/response/successful",
+    "VinhH/rfid/admin/register/response/failed",
     "VinhH/rfid/admin/delete",
 ];
 

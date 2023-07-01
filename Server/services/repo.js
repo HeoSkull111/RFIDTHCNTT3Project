@@ -2,10 +2,10 @@ import { database } from "../server.js";
 import { v4 as uuidv4 } from 'uuid';
 
 //register user here
-const registeredUsers = {
-    "04 D8 C1 2B": "Nguyen Teo Van",
-    "A7 A4 90 5F": "Tran Van Bao",
-}
+// const registeredUsers = {
+//     "04 D8 C1 2B": "Nguyen Teo Van",
+//     "A7 A4 90 5F": "Tran Van Bao",
+// }
 
 export const getUser = async (rfid) => {
     const reference = database.collection("users").doc(rfid);
@@ -26,46 +26,78 @@ export const getUsers = async () => {
     return data;
 }
 
+const getListUsers = async () => {
+    const reference = database.collection("listUsers");
+    const snapshot = await reference.get();
+    const data = snapshot.docs.map(doc => doc.data());
+    return data;
+}
+
+export const registerUser = async (rfid, name) => {
+    const reference = database.collection("listUsers");
+
+    let isSuccessful = false;
+
+    await reference.doc(rfid).set({
+        rfid: rfid,
+        name: name,
+        id: uuidv4(),
+        status: false
+    }).then(() => {
+        isSuccessful = true;
+        console.log("registered user");
+    });
+
+    return isSuccessful;
+}
+
 export const updateUserStatus = async (rfid) => {
     const reference = database.collection("users").doc(rfid);
-    let isValidUser = false;
     let isNewUser = false;
+
+    let listUsers = await getListUsers();
 
     await reference.get().then((snapshot) => {
         const data = snapshot.data();
 
         if (data === undefined) {
-            if (registeredUsers[rfid] === undefined) {
-                console.log("unknown user");
-            } else {
-                reference.set({ rfid, status: false, uid: uuidv4(), name: registeredUsers[rfid] });
-                console.log(`created new user with rfid: ${rfid} and name: ${registeredUsers[rfid]}`);
-                isValidUser = true;
+            let tempUser = listUsers.find(user => user.rfid === rfid);
+
+            if (tempUser === undefined) {
                 isNewUser = true;
+            } else {
+                reference.set({
+                    rfid: tempUser.rfid,
+                    name: tempUser.name,
+                    id: tempUser.id,
+                    status: !tempUser.status
+                });
+                console.log("updated user status");
             }
         } else {
             reference.update({ status: !data.status });
             console.log("updated user status");
-            isValidUser = true;
         }
     });
 
-    if (isValidUser) {      
-        return { rfid, isNewUser}
-    } else {
-        return null;
-    }
+    return { rfid, isNewUser }
 }
 
 export const deleteUser = async (rfid) => {
     const reference = database.collection("users").doc(rfid);
-    const snapshot = await reference.get();
-    const data = snapshot.data();
+    const referenceList = database.collection("listUsers").doc(rfid);
 
-    if (data === undefined) {
-        return null;
-    } else {
-        reference.delete();
-        return data;
+    const snapshot = await reference.get();
+    const snapshotList = await referenceList.get();
+
+    const data = snapshot.data();
+    const dataList = snapshotList.data();
+
+    if (data !== undefined) {
+        await reference.delete();
+    }
+
+    if (dataList !== undefined) {
+        await referenceList.delete();
     }
 }
