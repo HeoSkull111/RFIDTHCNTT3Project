@@ -3,8 +3,8 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define ssid "Nguyen MInh"
-#define password "268268268"
+#define ssid "VU"
+#define password "0933261747"
 
 // MQTT Broker Information
 #define mqtt_domain "broker.emqx.io"
@@ -16,23 +16,8 @@
 #define RST_PIN D3
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-// LED
-// #define CanRead D0
-// #define WaitingLED D1
-// #define SuccessfulLED D2
-
 WiFiClient espClient;
 PubSubClient client(espClient);
-
-// void initializePinMode() {
-//   Serial.println("\nInitialize PinMode");
-
-//   pinMode(CanRead, INPUT);
-//   pinMode(WaitingLED, OUTPUT);
-//   pinMode(SuccessfulLED, OUTPUT);
-
-//   Serial.println("Done");
-// }
 
 void initializeWIFI() {
   Serial.println("\nInitialize Wifi");
@@ -64,7 +49,6 @@ void setup() {
   Serial.begin(115200);
 
   // initialize
-  // initializePinMode();
   initializeWIFI();
   initializeRFID();
 
@@ -93,7 +77,7 @@ void reconnect() {
   // lặp cho đến khi được kết nối trở lại
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("mqttx_954e093c")) {
+    if (client.connect("DEMO")) {
       Serial.println("Connected");
       client.publish(mqtt_topic_pub, "Connected from NodeMCU ESP8266");
       client.subscribe(mqtt_topic_pub);
@@ -130,17 +114,12 @@ void processRFID() {
   if (millis() - lastMessageTime > 1000) {
     String RFIDData = readRFID();
 
-    // digitalWrite(SuccessfulLED, LOW);
-    // digitalWrite(WaitingLED, HIGH);
-
     if (!(RFIDData == "")) {
       const char *msg = RFIDData.c_str();
       Serial.println(msg);
       client.publish(mqtt_topic_pub, msg);
 
       lastMessageTime = millis();
-      // digitalWrite(SuccessfulLED, HIGH);
-      // digitalWrite(WaitingLED, LOW);
     }
   }
 }
@@ -150,9 +129,6 @@ void loop() {
     reconnect();
   }
   processRFID();
-  // if (digitalRead(CanRead)) {
-  //   processRFID();
-  // }
 
   client.loop();
 }

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 //register user here
 const registeredUsers = {
-    "04 D8 C1 2B ": "Nguyen Teo Van",
+    "04 D8 C1 2B": "Nguyen Teo Van",
     "A7 A4 90 5F": "Tran Van Bao",
 }
 
@@ -29,6 +29,7 @@ export const getUsers = async () => {
 export const updateUserStatus = async (rfid) => {
     const reference = database.collection("users").doc(rfid);
     let isValidUser = false;
+    let isNewUser = false;
 
     await reference.get().then((snapshot) => {
         const data = snapshot.data();
@@ -39,6 +40,8 @@ export const updateUserStatus = async (rfid) => {
             } else {
                 reference.set({ rfid, status: false, uid: uuidv4(), name: registeredUsers[rfid] });
                 console.log(`created new user with rfid: ${rfid} and name: ${registeredUsers[rfid]}`);
+                isValidUser = true;
+                isNewUser = true;
             }
         } else {
             reference.update({ status: !data.status });
@@ -47,8 +50,8 @@ export const updateUserStatus = async (rfid) => {
         }
     });
 
-    if (isValidUser) {
-        return rfid;
+    if (isValidUser) {      
+        return { rfid, isNewUser}
     } else {
         return null;
     }

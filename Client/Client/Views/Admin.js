@@ -1,55 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, Modal, StyleSheet, Pressable, TextInput } from "react-native";
-
 import init from "react_native_mqtt";
 
-import { MQTT } from "./src/service";
-import { mqttOptions, storageConfig } from "./src/config";
+import Status from "../services/status";
+
+import { MQTT } from "../services/service";
+import { mqttOptionAdmin, storageConfig, topicAdmin } from "../services/config";
 
 init(storageConfig);
 
-export const mqtt = new MQTT(mqttOptions);
+export const mqttAdmin = new MQTT(mqttOptionAdmin, topicAdmin);
+const serverAPI = "http://localhost:5555/"
 
-const App = () => {
-  const [text, setText] = useState('');
-  const [res, setRes] = useState('');
+export const Admin = () => {
+  const [users, setUsers] = useState([]);
+
   const [modalVisible, setModalVisible] = useState(false);
+  const [text, setText] = useState("");
 
   useEffect(() => {
-    mqtt.connect();
-    mqtt.setOnMessageArrived(onMessageArrived);
+    mqttAdmin.connect();
+    mqttAdmin.setOnMessageArrived(onMessageArrived);
+
+    getUsers();
   }, []);
 
   const onMessageArrived = async (m) => {
-    const message = m.payloadString;
-    console.log(`Message arrived: ${message}`);
-
-    setRes(message);
-    setModalVisible(true);
+    getUsers();
   }
 
-  const handleSubmit = () => {
-    mqtt.publishMessage("hntt/thcntt3/rfid/app", text);
+  const getUsers = async () => {
+    const response = await fetch(serverAPI + "users/");
+    const tempUsers = await response.json();
+    setUsers(tempUsers.map((user) => {
+      user.callbackDelete = () => {
+        mqttAdmin.publishMessage("VinhH/rfid/admin/delete", user.rfid);
+      }
+      return user;
+    }));
   }
 
   const handleOnCloseModal = () => {
     setModalVisible(!modalVisible);
+
+    // if (text === '') return;
+    // const targetDoc = doc(firebaseDB, 'users', rfid);
+    // setDoc(targetDoc, { name: text, rfid, status: false }).then(() => { setText(''); });
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.wrapper}>
-        <TextInput
-          style={[styles.text, styles.modalInput]}
-          placeholder="Enter your RFID"
-          onChangeText={setText}
-          value={text}
-        />
-        <Pressable
-          style={[styles.button, styles.buttonClose]}
-          onPress={() => { handleSubmit(); }}>
-          <Text style={styles.text}>Submit</Text>
-        </Pressable>
+        <Text style={styles.title}>
+          Current User Status
+        </Text>
+        <View>
+          {users.map((user, index) => {
+            return (
+              <Status key={index} user={user} />
+            )
+          })}
+        </View>
       </View>
       <Modal
         animationType="slide"
@@ -58,7 +69,13 @@ const App = () => {
         onRequestClose={() => { handleOnCloseModal(); }}>
         <View style={styles.modalContainer}>
           <View style={styles.modalWrapper}>
-            <Text style={styles.modalTitle}>{res}</Text>
+            <Text style={styles.modalTitle}>Create New User</Text>
+            <TextInput
+              style={[styles.text, styles.modalInput]}
+              placeholder="new name"
+              onChangeText={setText}
+              value={text}
+            />
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => { handleOnCloseModal(); }}>
@@ -70,8 +87,6 @@ const App = () => {
     </View>
   );
 };
-
-export default App;
 
 const styles = StyleSheet.create({
   container: {

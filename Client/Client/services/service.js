@@ -1,10 +1,6 @@
 export class MQTT {
-    constructor(options) {
-        this.topic = [
-            "hntt/thcntt3/rfid/admin",
-            "hntt/thcntt3/rfid/admin/register",
-            "hntt/thcntt3/rfid/admin/delete",
-        ];
+    constructor(options, topic) {
+        this.topic = topic;
         this.client = new Paho.MQTT.Client(options.host, options.port, options.path);
     }
 
