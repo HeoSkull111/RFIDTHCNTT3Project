@@ -12,7 +12,7 @@ init(storageConfig);
 export const mqttAdmin = new MQTT(mqttOptionAdmin, topicAdmin);
 const serverAPI = "http://localhost:5555/"
 
-export const Admin = () => {
+export const Admin = ({navigation}) => {
   const [users, setUsers] = useState([]);
 
   const [newUser, setNewUser] = useState("");
@@ -76,8 +76,6 @@ export const Admin = () => {
 
     if (text === '') return;
     mqttAdmin.publishMessage("VinhH/rfid/admin/register", `{ "name": "${text}", "rfid": "${newUser}" }`);
-    // const targetDoc = doc(firebaseDB, 'users', rfid);
-    // setDoc(targetDoc, { name: text, rfid, status: false }).then(() => { setText(''); });
   }
 
   const handleOnCloseModalStatus = () => {
@@ -87,16 +85,19 @@ export const Admin = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <Text style={styles.title}>
-          Current User Status
-        </Text>
-        <View>
-          {users.map((user, index) => {
-            return (
-              <Status key={index} user={user} />
-            )
-          })}
+      <View style={styles.divHeader}>
+        <Text style={styles.headerText}>Quản lý nhân viên</Text>
+      </View>
+      <View style={styles.divBody}>
+        <View style={styles.right}>
+          <Text style={styles.headingText}>Điểm Danh</Text>
+          <View>
+            {users.map((user, index) => {
+              return (
+                <Status key={index} user={user} />
+              )
+            })}
+          </View>
         </View>
       </View>
       <Modal
@@ -107,7 +108,7 @@ export const Admin = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalWrapper}>
             <Text style={styles.modalTitle}>Create New User</Text>
-            <Text> {newUser} </Text>
+            <Text style = {styles.text}> {newUser} </Text>
             <TextInput
               style={[styles.text, styles.modalInput]}
               placeholder="new name"
@@ -117,7 +118,7 @@ export const Admin = () => {
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => { handleOnCloseModalNewUser(); }}>
-              <Text style={styles.text}>Close</Text>
+              <Text style={styles.text}>Submit</Text>
             </Pressable>
           </View>
         </View>
@@ -146,84 +147,92 @@ export const Admin = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-
-    backgroundColor: "#111",
-  },
-  wrapper: {
-    padding: 40,
-    backgroundColor: "#222",
-    borderRadius: 10,
-    shadowColor: "#FFF",
-    shadowOffset: {
-      width: 0,
-      height: 0,
+    container: {
+        flex: 1,
+        padding: 8,
+        backgroundColor: '#000000',
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 30,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#fff",
-    textAlign: "center",
-  },
-  modalContainer: {
-    width: "100%",
-    height: "100%",
-
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-
-    backgroundColor: "#111",
-    color: "#fff",
-  },
-  modalWrapper: {
-    padding: 40,
-    backgroundColor: "#222",
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#fff",
-  },
-  modalInput: {
-    width: "100%",
-    height: 40,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    color: "#000",
-  },
-  text: {
-    marginTop: 10,
-    marginBottom: 10,
-    fontSize: 20,
-    color: "#fff",
-  },
-  button: {
-    borderRadius: 10,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    textAlign: "center",
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
+    divHeader: {
+        backgroundColor: '#222222',
+        padding: 24,
+        margin: 8,
+        borderRadius: 10,
+    },
+    headerText: {
+        fontSize: 50,
+        marginRight: 16,
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+    },
+    divBody: {
+      padding: 24,
+      margin: 8,
+      borderRadius: 10,
+      flex: 1, 
+      alignItems: 'center'
+    },
+    right: {
+        width: '80%',
+        marginLeft: 8,
+        padding: 16,
+        backgroundColor: '#222222',
+        borderRadius: 10,
+    },
+    headingText: {
+        fontSize: 30,
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom:10
+    },
+    modalContainer: {
+        width: "100%",
+        height: "100%",
+    
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    
+        backgroundColor: "#111",
+        color: "#fff",
+    },
+    modalWrapper: {
+        padding: 40,
+        backgroundColor: "#222",
+        borderRadius: 10,
+    },
+    modalTitle: {
+        fontSize: 30,
+        fontWeight: "bold",
+        marginBottom: 20,
+        color: "#fff",
+    },
+    modalInput: {
+        width: "100%",
+        height: 40,
+        marginBottom: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 10,
+        backgroundColor: "#fff",
+        color: "#000",
+    },
+    text: {
+        marginTop: 10,
+        marginBottom: 10,
+        fontSize: 20,
+        color: "#fff",
+    },
+    button: {
+        borderRadius: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+        textAlign: "center",
+        elevation: 2,
+    },
+    buttonClose: {
+        backgroundColor: '#2196F3',
+    },
 });
 

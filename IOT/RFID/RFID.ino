@@ -3,8 +3,8 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define ssid "VU"
-#define password "0933261747"
+#define ssid "Nguyen MInh"
+#define password "268268268"
 
 // MQTT Broker Information
 #define mqtt_domain "broker.emqx.io"

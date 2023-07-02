@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Modal, StyleSheet, Pressable, TextInput } from "react-native";
+import { Text, View, Modal, StyleSheet, Pressable, TextInput, Button } from "react-native";
 
 import init from "react_native_mqtt";
 
@@ -38,18 +38,23 @@ export const Customer = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <TextInput
-          style={[styles.text, styles.modalInput]}
-          placeholder="Enter your RFID"
-          onChangeText={setText}
-          value={text}
-        />
-        <Pressable
-          style={[styles.button, styles.buttonClose]}
-          onPress={() => { handleSubmit(); }}>
-          <Text style={styles.text}>Submit</Text>
-        </Pressable>
+      <View style={styles.divHeader}>
+        <Text style={styles.headerText}>Điểm danh cá nhân</Text>
+      </View>
+      <View style={styles.divBody}>
+        <View style={styles.wrapper}>
+          <TextInput
+            style={[styles.text, styles.modalInput]}
+            placeholder="Nhập mã RFID của bạn"
+            onChangeText={setText}
+            value={text}
+          />
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => { handleSubmit(); }}>
+            <Text style={styles.text}>Submit</Text>
+          </Pressable>
+        </View>
       </View>
       <Modal
         animationType="slide"
@@ -73,13 +78,9 @@ export const Customer = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-
-    backgroundColor: "#111",
+    flex: 1,
+    padding: 8,
+    backgroundColor: '#000000',
   },
   wrapper: {
     padding: 40,
@@ -145,11 +146,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     elevation: 2,
   },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
   buttonClose: {
     backgroundColor: '#2196F3',
+  },
+  divHeader: {
+    width: '99.15%',
+    backgroundColor: '#222222',
+    padding: 24,
+    margin: 8,
+    borderRadius: 10,
+  },
+  headerText: {
+    fontSize: 50,
+    marginRight: 16,
+    color: '#fff',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  divBody: {
+    padding: 24,
+    margin: 8,
+    borderRadius: 10,
+    flex: 1, 
+    alignItems: 'center'
   },
 });
 
