@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Text, View, Modal, StyleSheet, Pressable, TextInput } from "react-native";
 import init from "react_native_mqtt";
 
-import Status from "../services/status";
+import Status from "./status";
 
 import { MQTT } from "../services/service";
 import { mqttOptionAdmin, storageConfig, topicAdmin } from "../services/config";
